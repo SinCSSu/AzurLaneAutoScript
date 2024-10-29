@@ -72,12 +72,14 @@ class Screenshot(Adb, WSA, DroidCast, AScreenCap, Scrcpy, NemuIpc, LDOpenGL):
             if self.config.Error_SaveError:
                 self.screenshot_deque.append({'time': datetime.now(), 'image': self.image})
 
-            if self.check_screen_size() and self.check_screen_black():
-                break
             width, height = image_size(self.image)
-            if width == 1920:
+            if width == 1920 and height == 1080:
                 self.image = cv2.resize(self.image, (1280, 720), interpolation=cv2.INTER_AREA)
                 self.config.GameResolution_Width = 1920
+
+            if self.check_screen_size() and self.check_screen_black():
+                break
+
 
             else:
                 continue

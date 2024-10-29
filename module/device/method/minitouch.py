@@ -504,6 +504,8 @@ class Minitouch(Connection):
     def minitouch_init(self):
         logger.hr('MiniTouch init')
         max_x, max_y = 1280, 720
+        if self.config.GameResolution_Width == 1920:
+            max_x,max_y = 1920,1080
         max_contacts = 2
         max_pressure = 50
 
