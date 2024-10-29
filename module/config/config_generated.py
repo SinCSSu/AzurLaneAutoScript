@@ -442,3 +442,6 @@ class GeneratedConfig:
 
     # Group `Storage`
     Storage_Storage = {}
+
+    # Group `Game resolution`
+    GameResolution_Width = 1280

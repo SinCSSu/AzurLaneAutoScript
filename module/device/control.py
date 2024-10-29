@@ -36,6 +36,9 @@ class Control(Hermit, Minitouch, Scrcpy, MaaTouch, NemuIpc):
         if control_check:
             self.handle_control_check(button)
         x, y = random_rectangle_point(button.button)
+        if self.config.GameResolution_Width == 1920:
+            x = x * 1.5
+            y = y * 1.5
         x, y = ensure_int(x, y)
         logger.info(
             'Click %s @ %s' % (point2str(x, y), button)
@@ -66,6 +69,9 @@ class Control(Hermit, Minitouch, Scrcpy, MaaTouch, NemuIpc):
         """
         self.handle_control_check(button)
         x, y = random_rectangle_point(button.button)
+        if self.config.GameResolution_Width == 1920:
+            x = x * 1.5
+            y = y * 1.5
         x, y = ensure_int(x, y)
         duration = ensure_time(duration)
         logger.info(
@@ -87,6 +93,11 @@ class Control(Hermit, Minitouch, Scrcpy, MaaTouch, NemuIpc):
 
     def swipe(self, p1, p2, duration=(0.1, 0.2), name='SWIPE', distance_check=True):
         self.handle_control_check(name)
+        if self.config.GameResolution_Width == 1920:
+            p1[0] = p1[0] * 1.5
+            p1[1] = p1[1] * 1.5
+            p2[0] = p2[0] * 1.5
+            p2[1] = p2[1] * 1.5
         p1, p2 = ensure_int(p1, p2)
         duration = ensure_time(duration)
         method = self.config.Emulator_ControlMethod
@@ -150,6 +161,11 @@ class Control(Hermit, Minitouch, Scrcpy, MaaTouch, NemuIpc):
     def drag(self, p1, p2, segments=1, shake=(0, 15), point_random=(-10, -10, 10, 10), shake_random=(-5, -5, 5, 5),
              swipe_duration=0.25, shake_duration=0.1, name='DRAG'):
         self.handle_control_check(name)
+        if self.config.GameResolution_Width == 1920:
+            p1[0] = p1[0] * 1.5
+            p1[1] = p1[1] * 1.5
+            p2[0] = p2[0] * 1.5
+            p2[1] = p2[1] * 1.5
         p1, p2 = ensure_int(p1, p2)
         logger.info(
             'Drag %s -> %s' % (point2str(*p1), point2str(*p2))
