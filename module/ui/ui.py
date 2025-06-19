@@ -165,9 +165,7 @@ class UI(InfoHandler):
             if self.config.Emulator_ControlMethod == "uiautomator2":
                 self.device.uninstall_minicap()
 
-        @run_once
-        def rotation_check():
-            self.device.get_orientation()
+        orientation_timer = Timer(5)
 
         timeout = Timer(10, count=20).start()
         while 1:
@@ -208,7 +206,10 @@ class UI(InfoHandler):
 
             app_check()
             minicap_check()
-            rotation_check()
+            # continuously check rotation
+            if orientation_timer.reached():
+                self.device.get_orientation()
+                orientation_timer.reset()
 
         # Unknown page, need manual switching
         logger.warning("Unknown ui page")
@@ -478,10 +479,11 @@ class UI(InfoHandler):
 
         # Game tips
         # Event commission in Vacation Lane.
-        if self.appear(GAME_TIPS, offset=(30, 30), interval=3):
+        # 2025.05.29 game tips that infos skin feature when you enter dock
+        if self.appear(GAME_TIPS, offset=(30, 30), interval=2):
             logger.info(f'UI additional: {GAME_TIPS} -> {GOTO_MAIN}')
-            if self.appear_then_click(GOTO_MAIN, offset=(30, 30)):
-                return True
+            self.device.click(GOTO_MAIN)
+            return True
 
         # Dorm popup
         if self.appear(DORM_INFO, offset=(30, 30), similarity=0.75, interval=3):
@@ -499,6 +501,7 @@ class UI(InfoHandler):
         if self.appear(MEOWFFICER_BUY, offset=(30, 30), interval=3):
             logger.info(f'UI additional: {MEOWFFICER_BUY} -> {BACK_ARROW}')
             self.device.click(BACK_ARROW)
+            self.interval_reset(GET_SHIP)
             return True
 
         # Campaign preparation
@@ -552,18 +555,39 @@ class UI(InfoHandler):
             return True
 
         # Idle page
-        if self.get_interval_timer(IDLE, interval=3).reached():
-            if IDLE.match_luma(self.device.image, offset=(5, 5)):
-                logger.info(f'UI additional: {IDLE} -> {REWARD_GOTO_MAIN}')
-                self.device.click(REWARD_GOTO_MAIN)
-                self.get_interval_timer(IDLE).reset()
-                return True
+        if self.handle_idle_page():
+            return True
         # Switch on ui_white, no offset just color match
         if self.appear(MAIN_GOTO_MEMORIES_WHITE, interval=3):
             logger.info(f'UI additional: {MAIN_GOTO_MEMORIES_WHITE} -> {MAIN_TAB_SWITCH_WHITE}')
             self.device.click(MAIN_TAB_SWITCH_WHITE)
             return True
 
+        return False
+
+    def handle_idle_page(self):
+        """
+        Returns:
+            bool: If handled
+        """
+        timer = self.get_interval_timer(IDLE, interval=3)
+        if not timer.reached():
+            return False
+        if IDLE.match_luma(self.device.image, offset=(5, 5)):
+            logger.info(f'UI additional: {IDLE} -> {REWARD_GOTO_MAIN}')
+            self.device.click(REWARD_GOTO_MAIN)
+            timer.reset()
+            return True
+        if IDLE_2.match_luma(self.device.image, offset=(5, 5)):
+            logger.info(f'UI additional: {IDLE_2} -> {REWARD_GOTO_MAIN}')
+            self.device.click(REWARD_GOTO_MAIN)
+            timer.reset()
+            return True
+        if IDLE_3.match_luma(self.device.image, offset=(5, 5)):
+            logger.info(f'UI additional: {IDLE_3} -> {REWARD_GOTO_MAIN}')
+            self.device.click(REWARD_GOTO_MAIN)
+            timer.reset()
+            return True
         return False
 
     def ui_button_interval_reset(self, button):
